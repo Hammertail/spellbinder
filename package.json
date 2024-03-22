@@ -1,0 +1,24 @@
+{
+  "name": "spellbinder",
+  "version": "0.0.1",
+  "description": "",
+  "author": "Tamicktom",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --minify",
+    "lint": "tsc",
+    "changeset": "changeset",
+    "test": "glob -c \"node --import tsx --no-warnings --test\" \"./tests/**/*.test.ts\""
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.1",
+    "@types/glob": "^8.1.0",
+    "@types/node": "^20.11.30",
+    "glob": "^10.3.10",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.3"
+  }
+}
