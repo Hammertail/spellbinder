@@ -11,7 +11,7 @@
     "build": "tsup src/index.ts --format cjs,esm --dts --minify",
     "lint": "tsc",
     "changeset": "changeset",
-    "test": "glob -c \"node --import tsx --no-warnings --test\" \"./tests/**/*.test.ts\""
+    "test": "glob -c \"node --import tsx --no-warnings --test\" \"./**/*.test.ts\""
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
@@ -19,6 +19,7 @@
     "@types/node": "^20.11.30",
     "glob": "^10.3.10",
     "tsup": "^8.0.2",
+    "tsx": "^4.7.1",
     "typescript": "^5.4.3"
   }
 }

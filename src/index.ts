@@ -1,3 +1,8 @@
-export function add(a: number, b: number): number {
-  return a + b;
-}
+import { GET, POST } from "./http";
+
+const spell = {
+  GET,
+  POST,
+};
+
+export default spell;
