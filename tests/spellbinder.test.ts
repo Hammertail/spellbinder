@@ -20,5 +20,4 @@ test("Spellbinder get test", async () => {
   });
 
   const response = await spellbinder.Get({ url, schema });
-  console.log(response);
 });

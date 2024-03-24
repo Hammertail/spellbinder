@@ -61,12 +61,7 @@ export class Spellbinder {
 
     const data = await response.json();
 
-    const validated = params.schema.safeParse(data);
-    if (!validated.success) {
-      throw new SpellError(validated.error.message);
-    }
-
-    return validated.data;
+    return validateData(data, params.schema);
   }
 
   async Get<T>(params: GetArgs<T>): Promise<T> {
@@ -80,13 +75,15 @@ export class Spellbinder {
 
     const data = await response.json();
 
-    console.log(data);
-
-    const validated = params.schema.safeParse(data);
-    if (!validated.success) {
-      throw new SpellError(validated.error.message);
-    }
-
-    return validated.data;
+    return validateData(data, params.schema);
   }
+}
+
+function validateData<T>(data: any, schema: z.ZodSchema<T>): T {
+  const validated = schema.safeParse(data);
+  if (!validated.success) {
+    throw new SpellError(validated.error.message);
+  }
+
+  return validated.data;
 }
