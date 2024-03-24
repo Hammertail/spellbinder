@@ -1,5 +1,0 @@
----
-"spellbinder": patch
----
-
-first commit
