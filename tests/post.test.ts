@@ -2,8 +2,8 @@ import { test, it, describe } from "node:test";
 import { equal } from "node:assert";
 import assert from "node:assert";
 
-import { GET } from "./get";
+import { POST } from "../src/http/post";
 
-test("GET", () => {
-  console.log("GET tests passed");
+test("POST", () => {
+  console.log("POST tests passed");
 });
