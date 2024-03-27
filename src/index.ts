@@ -1,8 +1,16 @@
 //* Libraries imports
+import { Effect } from "effect";
 import z from "zod";
 
 //* Local imports
-import { fixUrlEnd, fixUrlStart, mergeUrls } from "./utils";
+import {
+  fixUrlEnd,
+  fixUrlStart,
+  mergeUrls,
+  validateData,
+  safeValidateData,
+  getDefaultHeaders,
+} from "./utils";
 
 type PostArgs<T> = {
   url: string;
@@ -16,21 +24,6 @@ type GetArgs<T> = {
   headers?: HeadersInit;
   schema: z.ZodSchema<T>;
 };
-
-export const getDefaultHeaders = (): HeadersInit => {
-  const defaultHeaders = {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  };
-  return defaultHeaders;
-};
-
-export class SpellError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "SpellError";
-  }
-}
 
 type ConstructorArgs = {
   baseUrl: string;
@@ -77,13 +70,4 @@ export class Spellbinder {
 
     return validateData(data, params.schema);
   }
-}
-
-function validateData<T>(data: any, schema: z.ZodSchema<T>): T {
-  const validated = schema.safeParse(data);
-  if (!validated.success) {
-    throw new SpellError(validated.error.message);
-  }
-
-  return validated.data;
 }

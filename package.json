@@ -28,6 +28,7 @@
     "typescript": "^5.4.3"
   },
   "dependencies": {
+    "effect": "^2.4.14",
     "zod": "^3.22.4"
   }
 }

@@ -4,7 +4,7 @@ import assert from "node:assert";
 
 import z from "zod";
 
-import { Spellbinder } from "../src";
+import { Spellbinder, SpellError } from "../src";
 
 test("Spellbinder get test", async () => {
   const url = "/users/tamicktom";
