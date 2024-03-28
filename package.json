@@ -21,8 +21,10 @@
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
     "@types/glob": "^8.1.0",
+    "@types/next": "^9.0.0",
     "@types/node": "^20.11.30",
     "glob": "^10.3.10",
+    "next": "^14.1.4",
     "tsup": "^8.0.2",
     "tsx": "^4.7.1",
     "typescript": "^5.4.3"

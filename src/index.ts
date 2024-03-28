@@ -13,18 +13,15 @@ import {
   SpellError,
 } from "./utils";
 
-type PostArgs<T> = {
+interface PostArgs<T> extends RequestInit {
   url: string;
-  body: string | object;
-  headers?: HeadersInit;
   schema: z.ZodSchema<T>;
-};
+}
 
-type GetArgs<T> = {
+interface GetArgs<T> extends RequestInit {
   url: string;
-  headers?: HeadersInit;
   schema: z.ZodSchema<T>;
-};
+}
 
 interface PutArgs<T> extends PostArgs<T> {}
 interface PatchArgs<T> extends PostArgs<T> {}
@@ -35,9 +32,25 @@ type ConstructorArgs = {
   defaultHeaders?: () => HeadersInit;
 };
 
+/**
+ * Basic class to make requests to an API. It has methods to make POST, GET, PUT, PATCH and DELETE requests.
+ * Usage example:
+ * ```typescript
+ * const spellbinder = new Spellbinder({ baseUrl: "https://api.example.com" });
+ *
+ * const data = await spellbinder.Get({
+ *  url: "users",
+ *  schema: z.array(z.object({
+ *  id: z.string(),
+ *  name: z.string(),
+ * })),
+ * ```
+ */
+
 class Spellbinder {
   private baseUrl: string;
   private defaultHeaders = getDefaultHeaders;
+
   public Post = this.post;
   public Get = this.get;
   public Put = this.put;
