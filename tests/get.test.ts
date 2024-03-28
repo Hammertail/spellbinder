@@ -22,8 +22,6 @@ test("Spellbinder Get test", async () => {
 
     const response = await spellbinder.Get({ url, schema });
 
-    console.log(response);
-
     equal(response.login, "Tamicktom");
     equal(response.id, 60244227);
     equal(response.created_at, "2020-01-24T00:19:27Z");
@@ -47,5 +45,52 @@ test("Spellbinder Get test", async () => {
     } catch (error) {
       assert(error instanceof SpellError);
     }
+  });
+
+  await it("should throw an error if the url is not correct", async () => {
+    const url = "users";
+    const spellbinder = new Spellbinder({ baseUrl: "https://api.github.com" });
+
+    const schema = z.object({
+      login: z.string(),
+      id: z.number(),
+      followers: z.number(),
+      following: z.number(),
+      created_at: z.string(),
+      updated_at: z.string(),
+    });
+
+    try {
+      await spellbinder.Get({ url, schema });
+    } catch (error) {
+      assert(error instanceof SpellError);
+    }
+  });
+
+  await it("should be able to use next cache", async () => {
+    const url = "/users/tamicktom";
+    const spellbinder = new Spellbinder({ baseUrl: "https://api.github.com" });
+
+    const schema = z.object({
+      login: z.string(),
+      id: z.number(),
+      followers: z.number(),
+      following: z.number(),
+      created_at: z.string(),
+      updated_at: z.string(),
+    });
+
+    const response = await spellbinder.Get({
+      url,
+      schema,
+      next: {
+        revalidate: 30, // 30 seconds
+        tags: ["user"],
+      },
+    });
+
+    equal(response.login, "Tamicktom");
+    equal(response.id, 60244227);
+    equal(response.created_at, "2020-01-24T00:19:27Z");
   });
 });
