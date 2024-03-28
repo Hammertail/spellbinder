@@ -10,6 +10,7 @@ import {
   validateData,
   safeValidateData,
   getDefaultHeaders,
+  SpellError,
 } from "./utils";
 
 type PostArgs<T> = {
@@ -25,12 +26,16 @@ type GetArgs<T> = {
   schema: z.ZodSchema<T>;
 };
 
+interface PutArgs<T> extends PostArgs<T> {}
+interface PatchArgs<T> extends PostArgs<T> {}
+interface DeleteArgs<T> extends GetArgs<T> {}
+
 type ConstructorArgs = {
   baseUrl: string;
   defaultHeaders?: () => HeadersInit;
 };
 
-export class Spellbinder {
+class Spellbinder {
   private baseUrl: string;
   private defaultHeaders = getDefaultHeaders;
 
@@ -70,4 +75,52 @@ export class Spellbinder {
 
     return validateData(data, params.schema);
   }
+
+  async Put<T>(params: PutArgs<T>): Promise<T> {
+    const url = mergeUrls(this.baseUrl, params.url);
+    const headers = params.headers || this.defaultHeaders();
+    const body = params.body;
+
+    const response = await fetch(url, {
+      method: "PUT",
+      body: JSON.stringify(body),
+      headers,
+    });
+
+    const data = await response.json();
+
+    return validateData(data, params.schema);
+  }
+
+  async Patch<T>(params: PatchArgs<T>): Promise<T> {
+    const url = mergeUrls(this.baseUrl, params.url);
+    const headers = params.headers || this.defaultHeaders();
+    const body = params.body;
+
+    const response = await fetch(url, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+      headers,
+    });
+
+    const data = await response.json();
+
+    return validateData(data, params.schema);
+  }
+
+  async Delete<T>(params: DeleteArgs<T>): Promise<T> {
+    const url = mergeUrls(this.baseUrl, params.url);
+    const headers = params.headers || this.defaultHeaders();
+
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers,
+    });
+
+    const data = await response.json();
+
+    return validateData(data, params.schema);
+  }
 }
+
+export { Spellbinder, SpellError };
