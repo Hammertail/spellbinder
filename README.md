@@ -5,6 +5,12 @@ You can use Zod to validate the response data and handle errors in a more struct
 
 This is NOT a replacement for the `fetch` API, but a wrapper around it to make it easier and convenient to use.
 
+## Features
+
+- Automatically parses the response data to JSON
+- Validates the response data using Zod
+- Handles errors in a more structured way (not yeat implemented)
+
 ## Installation
 
 ```bash
@@ -38,3 +44,18 @@ const response = await spellbinder.Get({ url, schema });
 // Be happy :)
 console.log(response);
 ```
+
+## Roadmap
+
+Not in any particular order:
+
+- [ ] Add support for typed query parameters in the URL.
+- [ ] Add safeGet, safePost, safePut, and safeDelete methods.
+- [ ] Better error handling.
+- [ ] Better documentation. (I know this is not good enough... Stop judging me 😅)
+- [ ] Suport for file uploads.
+- [ ] Support for file downloads.
+- [ ] Better support for custom headers.
+- [ ] Better suport for Nextjs cache API.
+- [ ] Add suport for others schemas validation libraries.
+- [ ] Add support for custom error handling.
