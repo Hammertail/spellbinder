@@ -9,7 +9,7 @@ import { Spellbinder, SpellError } from "../src";
 test("Spellbinder Get test", async () => {
   await it("should return the correct data from github", async () => {
     const url = "/users/tamicktom";
-    const spellbinder = new Spellbinder({ baseUrl: "https://api.github.com" });
+    const spellbinder = new Spellbinder({ baseUrl: "https://api.github.com/" });
 
     const schema = z.object({
       login: z.string(),
@@ -29,7 +29,7 @@ test("Spellbinder Get test", async () => {
 
   await it("should throw an error if the schema is not correct", async () => {
     const url = "/users/tamicktom";
-    const spellbinder = new Spellbinder({ baseUrl: "https://api.github.com" });
+    const spellbinder = new Spellbinder({ baseUrl: "https://api.github.com/" });
 
     const schema = z.object({
       login: z.string(),
