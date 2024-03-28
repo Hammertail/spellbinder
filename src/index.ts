@@ -38,6 +38,11 @@ type ConstructorArgs = {
 class Spellbinder {
   private baseUrl: string;
   private defaultHeaders = getDefaultHeaders;
+  public Post = this.post;
+  public Get = this.get;
+  public Put = this.put;
+  public Patch = this.patch;
+  public Delete = this.delete;
 
   constructor(args: ConstructorArgs) {
     this.baseUrl = args.baseUrl;
@@ -46,7 +51,7 @@ class Spellbinder {
     }
   }
 
-  async Post<T>(params: PostArgs<T>): Promise<T> {
+  public async post<T>(params: PostArgs<T>): Promise<T> {
     const url = mergeUrls(this.baseUrl, params.url);
     const headers = params.headers || this.defaultHeaders();
     const body = params.body;
@@ -62,7 +67,7 @@ class Spellbinder {
     return validateData(data, params.schema);
   }
 
-  async Get<T>(params: GetArgs<T>): Promise<T> {
+  public async get<T>(params: GetArgs<T>): Promise<T> {
     const url = mergeUrls(this.baseUrl, params.url);
     const headers = params.headers || this.defaultHeaders();
 
@@ -76,7 +81,7 @@ class Spellbinder {
     return validateData(data, params.schema);
   }
 
-  async Put<T>(params: PutArgs<T>): Promise<T> {
+  public async put<T>(params: PutArgs<T>): Promise<T> {
     const url = mergeUrls(this.baseUrl, params.url);
     const headers = params.headers || this.defaultHeaders();
     const body = params.body;
@@ -92,7 +97,7 @@ class Spellbinder {
     return validateData(data, params.schema);
   }
 
-  async Patch<T>(params: PatchArgs<T>): Promise<T> {
+  public async patch<T>(params: PatchArgs<T>): Promise<T> {
     const url = mergeUrls(this.baseUrl, params.url);
     const headers = params.headers || this.defaultHeaders();
     const body = params.body;
@@ -108,7 +113,7 @@ class Spellbinder {
     return validateData(data, params.schema);
   }
 
-  async Delete<T>(params: DeleteArgs<T>): Promise<T> {
+  public async delete<T>(params: DeleteArgs<T>): Promise<T> {
     const url = mergeUrls(this.baseUrl, params.url);
     const headers = params.headers || this.defaultHeaders();
 
