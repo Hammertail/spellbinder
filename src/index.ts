@@ -64,80 +64,113 @@ class Spellbinder {
     }
   }
 
-  public async post<T>(params: PostArgs<T>): Promise<T> {
-    const url = mergeUrls(this.baseUrl, params.url);
-    const headers = params.headers || this.defaultHeaders();
-    const body = params.body;
+  public async post<T>({
+    url,
+    schema,
+    headers,
+    body,
+    ...rest
+  }: PostArgs<T>): Promise<T> {
+    const requestUrl = mergeUrls(this.baseUrl, url);
+    const requestHeaders = headers || this.defaultHeaders();
+    const requestBody = body;
 
-    const response = await fetch(url, {
+    const response = await fetch(requestUrl, {
       method: "POST",
-      body: JSON.stringify(body),
-      headers,
+      body: JSON.stringify(requestBody),
+      headers: requestHeaders,
+      ...rest,
     });
 
     const data = await response.json();
 
-    return validateData(data, params.schema);
+    return validateData(data, schema);
   }
 
-  public async get<T>(params: GetArgs<T>): Promise<T> {
-    const url = mergeUrls(this.baseUrl, params.url);
-    const headers = params.headers || this.defaultHeaders();
+  public async get<T>({
+    url,
+    schema,
+    headers,
+    ...rest
+  }: GetArgs<T>): Promise<T> {
+    const requestUrl = mergeUrls(this.baseUrl, url);
+    const requestHeaders = headers || this.defaultHeaders();
 
-    const response = await fetch(url, {
+    const response = await fetch(requestUrl, {
       method: "GET",
-      headers,
+      headers: requestHeaders,
+      ...rest,
     });
 
     const data = await response.json();
 
-    return validateData(data, params.schema);
+    return validateData(data, schema);
   }
 
-  public async put<T>(params: PutArgs<T>): Promise<T> {
-    const url = mergeUrls(this.baseUrl, params.url);
-    const headers = params.headers || this.defaultHeaders();
-    const body = params.body;
+  public async put<T>({
+    url,
+    schema,
+    headers,
+    body,
+    ...rest
+  }: PutArgs<T>): Promise<T> {
+    const requestUrl = mergeUrls(this.baseUrl, url);
+    const requestHeaders = headers || this.defaultHeaders();
+    const requestBody = body;
 
-    const response = await fetch(url, {
+    const response = await fetch(requestUrl, {
       method: "PUT",
-      body: JSON.stringify(body),
-      headers,
+      body: JSON.stringify(requestBody),
+      headers: requestHeaders,
+      ...rest,
     });
 
     const data = await response.json();
 
-    return validateData(data, params.schema);
+    return validateData(data, schema);
   }
 
-  public async patch<T>(params: PatchArgs<T>): Promise<T> {
-    const url = mergeUrls(this.baseUrl, params.url);
-    const headers = params.headers || this.defaultHeaders();
-    const body = params.body;
+  public async patch<T>({
+    url,
+    schema,
+    headers,
+    body,
+    ...rest
+  }: PatchArgs<T>): Promise<T> {
+    const requestUrl = mergeUrls(this.baseUrl, url);
+    const requestHeaders = headers || this.defaultHeaders();
+    const requestBody = body;
 
-    const response = await fetch(url, {
+    const response = await fetch(requestUrl, {
       method: "PATCH",
-      body: JSON.stringify(body),
-      headers,
+      body: JSON.stringify(requestBody),
+      headers: requestHeaders,
+      ...rest,
     });
 
     const data = await response.json();
 
-    return validateData(data, params.schema);
+    return validateData(data, schema);
   }
 
-  public async delete<T>(params: DeleteArgs<T>): Promise<T> {
-    const url = mergeUrls(this.baseUrl, params.url);
-    const headers = params.headers || this.defaultHeaders();
+  public async delete<T>({
+    url,
+    schema,
+    headers,
+    ...rest
+  }: DeleteArgs<T>): Promise<T> {
+    const requestUrl = mergeUrls(this.baseUrl, url);
+    const requestHeaders = headers || this.defaultHeaders();
 
-    const response = await fetch(url, {
+    const response = await fetch(requestUrl, {
       method: "DELETE",
-      headers,
+      headers: requestHeaders,
+      ...rest,
     });
 
     const data = await response.json();
 
-    return validateData(data, params.schema);
+    return validateData(data, schema);
   }
 }
 
