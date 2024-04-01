@@ -94,7 +94,15 @@ class Spellbinder {
     ...rest
   }: GetArgs<T>): Promise<T> {
     const requestUrl = mergeUrls(this.baseUrl, url);
-    co
+    const requestHeaders = headers || this.defaultHeaders();
+
+    const response = await fetch(requestUrl, {
+      method: "GET",
+      headers: requestHeaders,
+      ...rest,
+    });
+
+    const data = await response.json();
 
     return validateData(data, schema);
   }
