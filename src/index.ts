@@ -16,6 +16,7 @@ import {
 interface PostArgs<T> extends RequestInit {
   url: string;
   schema: z.ZodSchema<T>;
+  body: any; // justification: any type is needed here
 }
 
 interface GetArgs<T> extends RequestInit {
