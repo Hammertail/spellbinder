@@ -8,19 +8,25 @@ import { Spellbinder, SpellError } from "../src";
 
 test("Spellbinder Post test", async () => {
   await it("should return the correct data from github", async () => {
-    const spell = new Spellbinder({ baseUrl: "https://api.github.com/" });
-    const url = "/users";
-    const body = {};
-
-    const schema = z.object({
-      login: z.string(),
-      id: z.number(),
-      followers: z.number(),
-      following: z.number(),
-      created_at: z.string(),
-      updated_at: z.string(),
+    const url = "/";
+    const spellbinder = new Spellbinder({
+      baseUrl: "https://echo.hoppscotch.io",
     });
 
-    const response = await spell.Post({ url, schema, body });
+    const schema = z.object({
+      method: z.enum(["POST"]),
+      args: z.object({}),
+      data: z.string(),
+    });
+
+    const body = { data: "Hello, World!" };
+
+    const data = await spellbinder.Post({
+      url,
+      schema,
+      body,
+    });
+
+    assert(data.data === JSON.stringify(body));
   });
 });
