@@ -107,4 +107,31 @@ test("Spellbinder Post tests", async () => {
 
     assert(response.data === JSON.stringify(body));
   });
+
+  await it("should work with URL parameters", async () => {
+    const url = "/post?name=John&age=30";
+    const spellbinder = new Spellbinder({
+      baseUrl: "https://echo.hoppscotch.io",
+    });
+
+    const schema = z.object({
+      method: z.enum(["POST"]),
+      data: z.string(),
+      path: z.literal("/post"),
+      args: z.object({
+        name: z.literal("John"),
+        age: z.literal("30"),
+      }),
+    });
+
+    const body = { data: "Hello, World!" };
+
+    const response = await spellbinder.Post({
+      url,
+      schema,
+      body,
+    });
+
+    assert(response.data === JSON.stringify(body));
+  });
 });
