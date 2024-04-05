@@ -1,5 +1,5 @@
 //* Libraries imports
-import { Effect } from "effect";
+import { Effect, Request } from "effect";
 import z from "zod";
 
 //* Local imports

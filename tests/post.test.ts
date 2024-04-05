@@ -29,4 +29,29 @@ test("Spellbinder Post test", async () => {
 
     assert(data.data === JSON.stringify(body));
   });
+
+  await it("should throw an error if the schema is incorrect", async () => {
+    const url = "/";
+    const spellbinder = new Spellbinder({
+      baseUrl: "https://echo.hoppscotch.io",
+    });
+
+    const schema = z.object({
+      method: z.enum(["POST"]),
+      args: z.object({}),
+      data: z.number(),
+    });
+
+    const body = { data: "Hello, World!" };
+
+    try {
+      await spellbinder.Post({
+        url,
+        schema,
+        body,
+      });
+    } catch (error) {
+      assert(error instanceof SpellError);
+    }
+  });
 });
