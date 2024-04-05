@@ -17,6 +17,7 @@ test("Spellbinder Post test", async () => {
       method: z.enum(["POST"]),
       args: z.object({}),
       data: z.string(),
+      path: z.string(),
     });
 
     const body = { data: "Hello, World!" };
@@ -40,6 +41,7 @@ test("Spellbinder Post test", async () => {
       method: z.enum(["POST"]),
       args: z.object({}),
       data: z.number(),
+      path: z.number(),
     });
 
     const body = { data: "Hello, World!" };
@@ -53,5 +55,56 @@ test("Spellbinder Post test", async () => {
     } catch (error) {
       assert(error instanceof SpellError);
     }
+  });
+
+  await it("should work with custom headers", async () => {
+    const url = "/";
+    const spellbinder = new Spellbinder({
+      baseUrl: "https://echo.hoppscotch.io",
+    });
+
+    const schema = z.object({
+      method: z.enum(["POST"]),
+      args: z.object({}),
+      data: z.string(),
+      path: z.string(),
+    });
+
+    const body = { data: "Hello, World!" };
+
+    const data = await spellbinder.Post({
+      url,
+      schema,
+      body,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    assert(data.data === JSON.stringify(body));
+  });
+
+  await it("should work with another route", async () => {
+    const url = "/post";
+    const spellbinder = new Spellbinder({
+      baseUrl: "https://echo.hoppscotch.io",
+    });
+
+    const schema = z.object({
+      method: z.enum(["POST"]),
+      args: z.object({}),
+      data: z.string(),
+      path: z.literal("/post"),
+    });
+
+    const body = { data: "Hello, World!" };
+
+    const data = await spellbinder.Post({
+      url,
+      schema,
+      body,
+    });
+
+    assert(data.data === JSON.stringify(body));
   });
 });
