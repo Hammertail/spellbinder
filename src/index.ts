@@ -13,17 +13,16 @@ import {
   SpellError,
 } from "./utils";
 
-interface PostArgs<T> extends RequestInit {
-  url: string;
-  schema: z.ZodSchema<T>;
-  body: any; // justification: any type is needed here
-}
-
-interface GetArgs<T> extends RequestInit {
+interface BaseArgs<T> extends RequestInit {
   url: string;
   schema: z.ZodSchema<T>;
 }
 
+interface PostArgs<T> extends BaseArgs<T> {
+  body: any; // justification: any type is needed here to allow any type of body
+}
+
+interface GetArgs<T> extends BaseArgs<T> {}
 interface PutArgs<T> extends PostArgs<T> {}
 interface PatchArgs<T> extends PostArgs<T> {}
 interface DeleteArgs<T> extends GetArgs<T> {}
