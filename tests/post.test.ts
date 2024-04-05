@@ -6,8 +6,8 @@ import z from "zod";
 
 import { Spellbinder, SpellError } from "../src";
 
-test("Spellbinder Post test", async () => {
-  await it("should return the correct data from github", async () => {
+test("Spellbinder Post tests", async () => {
+  await it("should return the correct data", async () => {
     const url = "/";
     const spellbinder = new Spellbinder({
       baseUrl: "https://echo.hoppscotch.io",
@@ -22,13 +22,13 @@ test("Spellbinder Post test", async () => {
 
     const body = { data: "Hello, World!" };
 
-    const data = await spellbinder.Post({
+    const response = await spellbinder.Post({
       url,
       schema,
       body,
     });
 
-    assert(data.data === JSON.stringify(body));
+    assert(response.data === JSON.stringify(body));
   });
 
   await it("should throw an error if the schema is incorrect", async () => {
@@ -72,7 +72,7 @@ test("Spellbinder Post test", async () => {
 
     const body = { data: "Hello, World!" };
 
-    const data = await spellbinder.Post({
+    const response = await spellbinder.Post({
       url,
       schema,
       body,
@@ -81,7 +81,7 @@ test("Spellbinder Post test", async () => {
       },
     });
 
-    assert(data.data === JSON.stringify(body));
+    assert(response.data === JSON.stringify(body));
   });
 
   await it("should work with another route", async () => {
@@ -99,12 +99,12 @@ test("Spellbinder Post test", async () => {
 
     const body = { data: "Hello, World!" };
 
-    const data = await spellbinder.Post({
+    const response = await spellbinder.Post({
       url,
       schema,
       body,
     });
 
-    assert(data.data === JSON.stringify(body));
+    assert(response.data === JSON.stringify(body));
   });
 });
