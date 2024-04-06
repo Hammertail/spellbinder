@@ -6,10 +6,14 @@ import z from "zod";
 
 import { Spellbinder, SpellError } from "../src";
 
-test("Spellbinder Get test", async () => {
+test("Spellbinder get test", async () => {
   await it("should return the correct data from github", async () => {
-    const url = "/users/tamicktom";
-    const spellbinder = new Spellbinder({ baseUrl: "https://api.github.com/" });
+
+    const spellbinder = new Spellbinder({
+      baseUrl: "https://api.github.com/",
+    });
+
+    const url = "/users/tamicktom?search=1";
 
     const schema = z.object({
       login: z.string(),
@@ -20,7 +24,7 @@ test("Spellbinder Get test", async () => {
       updated_at: z.string(),
     });
 
-    const response = await spellbinder.Get({ url, schema });
+    const response = await spellbinder.get({ url, schema });
 
     equal(response.login, "Tamicktom");
     equal(response.id, 60244227);
@@ -41,7 +45,7 @@ test("Spellbinder Get test", async () => {
     });
 
     try {
-      await spellbinder.Get({ url, schema: schema.array() });
+      const banna = await spellbinder.get({ url, schema: schema.array() });
     } catch (error) {
       assert(error instanceof SpellError);
     }
@@ -61,7 +65,7 @@ test("Spellbinder Get test", async () => {
     });
 
     try {
-      await spellbinder.Get({ url, schema });
+      await spellbinder.get({ url, schema });
     } catch (error) {
       assert(error instanceof SpellError);
     }
@@ -80,7 +84,7 @@ test("Spellbinder Get test", async () => {
       updated_at: z.string(),
     });
 
-    const response = await spellbinder.Get({
+    const response = await spellbinder.get({
       url,
       schema,
       next: {

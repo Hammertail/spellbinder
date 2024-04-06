@@ -48,12 +48,6 @@ export class Spellbinder {
   private baseUrl: string;
   private defaultHeaders = getDefaultHeaders;
 
-  public Post = this.post;
-  public Get = this.get;
-  public Put = this.put;
-  public Patch = this.patch;
-  public Delete = this.delete;
-
   constructor(args: ConstructorArgs) {
     this.baseUrl = args.baseUrl;
     if (args.defaultHeaders) {
