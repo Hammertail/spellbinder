@@ -8,21 +8,25 @@ import {
   validateData,
   getDefaultHeaders,
   SpellError,
+  createUrl
 } from "./utils";
+
+type Params = Record<string | number, string | number>;
 
 interface BaseArgs<T> extends RequestInit {
   url: string;
   schema: z.ZodSchema<T>;
+  params?: Params;
 }
 
 interface PostArgs<T> extends BaseArgs<T> {
   body: any; // justification: any type is needed here to allow any type of body
 }
 
-interface GetArgs<T> extends BaseArgs<T> {}
-interface PutArgs<T> extends PostArgs<T> {}
-interface PatchArgs<T> extends PostArgs<T> {}
-interface DeleteArgs<T> extends GetArgs<T> {}
+interface GetArgs<T> extends BaseArgs<T> { }
+interface PutArgs<T> extends PostArgs<T> { }
+interface PatchArgs<T> extends PostArgs<T> { }
+interface DeleteArgs<T> extends GetArgs<T> { }
 
 type ConstructorArgs = {
   baseUrl: string;
@@ -60,9 +64,10 @@ export class Spellbinder {
     schema,
     headers,
     body,
+    params,
     ...rest
   }: PostArgs<T>): Promise<T> {
-    const requestUrl = mergeUrls(this.baseUrl, url);
+    const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
     const requestHeaders = headers || this.defaultHeaders();
     const requestBody = body;
 
@@ -82,9 +87,10 @@ export class Spellbinder {
     url,
     schema,
     headers,
+    params,
     ...rest
   }: GetArgs<T>): Promise<T> {
-    const requestUrl = mergeUrls(this.baseUrl, url);
+    const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
     const requestHeaders = headers || this.defaultHeaders();
 
     const response = await fetch(requestUrl, {
@@ -103,9 +109,10 @@ export class Spellbinder {
     schema,
     headers,
     body,
+    params,
     ...rest
   }: PutArgs<T>): Promise<T> {
-    const requestUrl = mergeUrls(this.baseUrl, url);
+    const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
     const requestHeaders = headers || this.defaultHeaders();
     const requestBody = body;
 
@@ -126,9 +133,10 @@ export class Spellbinder {
     schema,
     headers,
     body,
+    params,
     ...rest
   }: PatchArgs<T>): Promise<T> {
-    const requestUrl = mergeUrls(this.baseUrl, url);
+    const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
     const requestHeaders = headers || this.defaultHeaders();
     const requestBody = body;
 
@@ -148,9 +156,10 @@ export class Spellbinder {
     url,
     schema,
     headers,
+    params,
     ...rest
   }: DeleteArgs<T>): Promise<T> {
-    const requestUrl = mergeUrls(this.baseUrl, url);
+    const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
     const requestHeaders = headers || this.defaultHeaders();
 
     const response = await fetch(requestUrl, {

@@ -22,7 +22,7 @@ test("Spellbinder Post tests", async () => {
 
     const body = { data: "Hello, World!" };
 
-    const response = await spellbinder.Post({
+    const response = await spellbinder.post({
       url,
       schema,
       body,
@@ -47,7 +47,7 @@ test("Spellbinder Post tests", async () => {
     const body = { data: "Hello, World!" };
 
     try {
-      await spellbinder.Post({
+      await spellbinder.post({
         url,
         schema,
         body,
@@ -72,7 +72,7 @@ test("Spellbinder Post tests", async () => {
 
     const body = { data: "Hello, World!" };
 
-    const response = await spellbinder.Post({
+    const response = await spellbinder.post({
       url,
       schema,
       body,
@@ -99,7 +99,7 @@ test("Spellbinder Post tests", async () => {
 
     const body = { data: "Hello, World!" };
 
-    const response = await spellbinder.Post({
+    const response = await spellbinder.post({
       url,
       schema,
       body,
@@ -109,10 +109,12 @@ test("Spellbinder Post tests", async () => {
   });
 
   await it("should work with URL parameters", async () => {
-    const url = "/post?name=John&age=30";
+    const url = "/post";
     const spellbinder = new Spellbinder({
       baseUrl: "https://echo.hoppscotch.io",
     });
+
+    const params = { name: "John", age: "30" };
 
     const schema = z.object({
       method: z.enum(["POST"]),
@@ -126,10 +128,11 @@ test("Spellbinder Post tests", async () => {
 
     const body = { data: "Hello, World!" };
 
-    const response = await spellbinder.Post({
+    const response = await spellbinder.post({
       url,
       schema,
       body,
+      params,
     });
 
     assert(response.data === JSON.stringify(body));
