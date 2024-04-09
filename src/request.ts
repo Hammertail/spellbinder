@@ -10,19 +10,22 @@ import {
   SpellError,
 } from "./utils";
 
+type Params = Record<string | number, string | number>;
+
 interface BaseArgs<T> extends RequestInit {
   url: string;
   schema: z.ZodSchema<T>;
+  params?: Params;
 }
 
 interface PostArgs<T> extends BaseArgs<T> {
   body: any; // justification: any type is needed here to allow any type of body
 }
 
-interface GetArgs<T> extends BaseArgs<T> {}
-interface PutArgs<T> extends PostArgs<T> {}
-interface PatchArgs<T> extends PostArgs<T> {}
-interface DeleteArgs<T> extends GetArgs<T> {}
+interface GetArgs<T> extends BaseArgs<T> { }
+interface PutArgs<T> extends PostArgs<T> { }
+interface PatchArgs<T> extends PostArgs<T> { }
+interface DeleteArgs<T> extends GetArgs<T> { }
 
 type ConstructorArgs = {
   baseUrl: string;

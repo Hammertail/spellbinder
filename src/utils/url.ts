@@ -4,7 +4,7 @@
  * createUrlArgs({ page: 1, limit: 10 }) => "?page=1&limit=10"
  */
 
-export function createUrlArgs(
+export function createUrlParams(
   args: Record<string | number, string | number>
 ): string {
   return Object.entries(args).reduce((acc, [key, value], index) => {
@@ -21,7 +21,16 @@ export function createUrl(
   url: string,
   args: Record<string | number, string | number>
 ): string {
-  return `${mergeUrls(baseUrl, url)}${createUrlArgs(args)}`;
+  const mergedUrl = mergeUrls(baseUrl, url);
+  const urlParams = createUrlParams(args);
+
+  if (mergedUrl.endsWith("?"))
+    return `${mergedUrl}${urlParams.slice(1)}`;
+
+  if (mergedUrl.endsWith("/"))
+    return `${mergedUrl.slice(0, -1)}${urlParams}`;
+
+  return `${mergeUrls(baseUrl, url)}${createUrlParams(args)}`;
 }
 
 /**

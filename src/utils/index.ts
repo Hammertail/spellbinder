@@ -4,7 +4,7 @@ import z from "zod";
 
 export {
   createUrl,
-  createUrlArgs,
+  createUrlParams as createUrlArgs,
   fixUrlEnd,
   fixUrlStart,
   mergeUrls,
