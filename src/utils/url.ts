@@ -1,6 +1,8 @@
 /**
  * This function creates a query string from an object.
+ * 
  * example:
+ * 
  * createUrlArgs({ page: 1, limit: 10 }) => "?page=1&limit=10"
  */
 
@@ -14,6 +16,10 @@ export function createUrlParams(
 
 /**
  * This function concatenates the baseUrl with the url and creates a query string from the args.
+ * 
+ * example:
+ * 
+ * createUrl("https://example.com", "/users", { page: 1, limit: 10 }) => "https://example.com/users?page=1&limit=10"
  */
 
 export function createUrl(
@@ -34,7 +40,11 @@ export function createUrl(
 }
 
 /**
- * Add "/" to the end of the url if it doesn't have it
+ * Add "/" to the end of the url if it doesn't have it.
+ * 
+ * example:
+ * 
+ * fixUrlEnd("https://example.com") => "https://example.com/"
  */
 
 export function fixUrlEnd(url: string) {
@@ -42,7 +52,11 @@ export function fixUrlEnd(url: string) {
 }
 
 /**
- * Remove "/" from the start of the url if it has it
+ * Remove "/" from the start of the url if it has it.
+ * 
+ * example:
+ * 
+ * fixUrlStart("/users") => "users"
  */
 
 export function fixUrlStart(url: string) {
@@ -50,7 +64,11 @@ export function fixUrlStart(url: string) {
 }
 
 /**
- * Merge two urls
+ * Merge two urls. It adds "/" to the end of the baseUrl and removes "/" from the start of the url.
+ * 
+ * example:
+ * 
+ * mergeUrls("https://example.com", "/users") => "https://example.com/users"
  */
 
 export function mergeUrls(baseUrl: string, url: string) {

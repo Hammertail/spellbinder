@@ -8,6 +8,7 @@ import {
   validateData,
   getDefaultHeaders,
   SpellError,
+  createUrl
 } from "./utils";
 
 type Params = Record<string | number, string | number>;
@@ -63,9 +64,10 @@ export class Spellbinder {
     schema,
     headers,
     body,
+    params,
     ...rest
   }: PostArgs<T>): Promise<T> {
-    const requestUrl = mergeUrls(this.baseUrl, url);
+    const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
     const requestHeaders = headers || this.defaultHeaders();
     const requestBody = body;
 
@@ -85,9 +87,10 @@ export class Spellbinder {
     url,
     schema,
     headers,
+    params,
     ...rest
   }: GetArgs<T>): Promise<T> {
-    const requestUrl = mergeUrls(this.baseUrl, url);
+    const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
     const requestHeaders = headers || this.defaultHeaders();
 
     const response = await fetch(requestUrl, {
@@ -106,9 +109,10 @@ export class Spellbinder {
     schema,
     headers,
     body,
+    params,
     ...rest
   }: PutArgs<T>): Promise<T> {
-    const requestUrl = mergeUrls(this.baseUrl, url);
+    const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
     const requestHeaders = headers || this.defaultHeaders();
     const requestBody = body;
 
@@ -129,9 +133,10 @@ export class Spellbinder {
     schema,
     headers,
     body,
+    params,
     ...rest
   }: PatchArgs<T>): Promise<T> {
-    const requestUrl = mergeUrls(this.baseUrl, url);
+    const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
     const requestHeaders = headers || this.defaultHeaders();
     const requestBody = body;
 
@@ -151,9 +156,10 @@ export class Spellbinder {
     url,
     schema,
     headers,
+    params,
     ...rest
   }: DeleteArgs<T>): Promise<T> {
-    const requestUrl = mergeUrls(this.baseUrl, url);
+    const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
     const requestHeaders = headers || this.defaultHeaders();
 
     const response = await fetch(requestUrl, {

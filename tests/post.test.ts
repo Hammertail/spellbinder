@@ -108,30 +108,33 @@ test("Spellbinder Post tests", async () => {
     assert(response.data === JSON.stringify(body));
   });
 
-  // await it("should work with URL parameters", async () => {
-  //   const url = "/post?name=John&age=30";
-  //   const spellbinder = new Spellbinder({
-  //     baseUrl: "https://echo.hoppscotch.io",
-  //   });
+  await it("should work with URL parameters", async () => {
+    const url = "/post";
+    const spellbinder = new Spellbinder({
+      baseUrl: "https://echo.hoppscotch.io",
+    });
 
-  //   const schema = z.object({
-  //     method: z.enum(["POST"]),
-  //     data: z.string(),
-  //     path: z.literal("/post"),
-  //     args: z.object({
-  //       name: z.literal("John"),
-  //       age: z.literal("30"),
-  //     }),
-  //   });
+    const params = { name: "John", age: "30" };
 
-  //   const body = { data: "Hello, World!" };
+    const schema = z.object({
+      method: z.enum(["POST"]),
+      data: z.string(),
+      path: z.literal("/post"),
+      args: z.object({
+        name: z.literal("John"),
+        age: z.literal("30"),
+      }),
+    });
 
-  //   const response = await spellbinder.post({
-  //     url,
-  //     schema,
-  //     body,
-  //   });
+    const body = { data: "Hello, World!" };
 
-  //   assert(response.data === JSON.stringify(body));
-  // });
+    const response = await spellbinder.post({
+      url,
+      schema,
+      body,
+      params,
+    });
+
+    assert(response.data === JSON.stringify(body));
+  });
 });
