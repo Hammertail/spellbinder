@@ -6,7 +6,7 @@ import z from "zod";
 
 import { Spellbinder, SpellError } from "../src";
 
-test("Spellbinder Post tests", async () => {
+test("Spellbinder Put tests", async () => {
   await it("should return the correct data", async () => {
     const url = "/";
     const spellbinder = new Spellbinder({
@@ -14,7 +14,7 @@ test("Spellbinder Post tests", async () => {
     });
 
     const schema = z.object({
-      method: z.enum(["POST"]),
+      method: z.enum(["PUT"]),
       args: z.object({}),
       data: z.string(),
       path: z.string(),
@@ -22,7 +22,7 @@ test("Spellbinder Post tests", async () => {
 
     const body = { data: "Hello, World!" };
 
-    const response = await spellbinder.post({
+    const response = await spellbinder.put({
       url,
       schema,
       body,
@@ -38,7 +38,7 @@ test("Spellbinder Post tests", async () => {
     });
 
     const schema = z.object({
-      method: z.enum(["POST"]),
+      method: z.enum(["PUT"]),
       args: z.object({}),
       data: z.number(),
       path: z.number(),
@@ -47,7 +47,7 @@ test("Spellbinder Post tests", async () => {
     const body = { data: "Hello, World!" };
 
     try {
-      await spellbinder.post({
+      await spellbinder.put({
         url,
         schema,
         body,
@@ -64,7 +64,7 @@ test("Spellbinder Post tests", async () => {
     });
 
     const schema = z.object({
-      method: z.enum(["POST"]),
+      method: z.enum(["PUT"]),
       args: z.object({}),
       data: z.string(),
       path: z.string(),
@@ -72,7 +72,7 @@ test("Spellbinder Post tests", async () => {
 
     const body = { data: "Hello, World!" };
 
-    const response = await spellbinder.post({
+    const response = await spellbinder.put({
       url,
       schema,
       body,
@@ -85,21 +85,21 @@ test("Spellbinder Post tests", async () => {
   });
 
   await it("should work with another route", async () => {
-    const url = "/post";
+    const url = "/put";
     const spellbinder = new Spellbinder({
       baseUrl: "https://echo.hoppscotch.io",
     });
 
     const schema = z.object({
-      method: z.enum(["POST"]),
+      method: z.enum(["PUT"]),
       args: z.object({}),
       data: z.string(),
-      path: z.literal("/post"),
+      path: z.literal("/put"),
     });
 
     const body = { data: "Hello, World!" };
 
-    const response = await spellbinder.post({
+    const response = await spellbinder.put({
       url,
       schema,
       body,
@@ -109,7 +109,7 @@ test("Spellbinder Post tests", async () => {
   });
 
   await it("should work with URL parameters", async () => {
-    const url = "/post";
+    const url = "/put";
     const spellbinder = new Spellbinder({
       baseUrl: "https://echo.hoppscotch.io",
     });
@@ -117,9 +117,9 @@ test("Spellbinder Post tests", async () => {
     const params = { name: "John", age: "30" };
 
     const schema = z.object({
-      method: z.enum(["POST"]),
+      method: z.enum(["PUT"]),
       data: z.string(),
-      path: z.literal("/post"),
+      path: z.literal("/put"),
       args: z.object({
         name: z.literal("John"),
         age: z.literal("30"),
@@ -128,7 +128,7 @@ test("Spellbinder Post tests", async () => {
 
     const body = { data: "Hello, World!" };
 
-    const response = await spellbinder.post({
+    const response = await spellbinder.put({
       url,
       schema,
       body,
@@ -147,7 +147,7 @@ test("Spellbinder Post tests", async () => {
     const params = { name: "John", age: "30" };
 
     const schema = z.object({
-      method: z.enum(["POST"]),
+      method: z.enum(["PUT"]),
       data: z.string(),
       path: z.literal("/"),
       args: z.object({
@@ -161,7 +161,7 @@ test("Spellbinder Post tests", async () => {
     body.append("name", "John");
     body.append("age", "30");
 
-    await spellbinder.post({
+    await spellbinder.put({
       url,
       schema,
       body,

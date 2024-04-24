@@ -1,6 +1,5 @@
 //* Libraries imports
-import { Effect } from "effect";
-import z from "zod";
+import type z from "zod";
 
 export {
   createUrl,
