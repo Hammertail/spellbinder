@@ -1,4 +1,4 @@
-import { SpellError } from "../../dist";
+import { SpellError } from "./";
 
 
 type DebuggerLoggerArgs = {
