@@ -1,15 +1,15 @@
 //* Libraries imports
-import { Effect, Request } from "effect";
-import z from "zod";
+import type z from "zod";
 
 //* Local imports
 import {
   mergeUrls,
   validateData,
   getDefaultHeaders,
-  SpellError,
   createUrl
 } from "./utils";
+import { parseBody } from "./utils/parse-body";
+import { debugLogger } from "./utils/debug-logger";
 
 type Params = Record<string | number, string | number>;
 
@@ -20,7 +20,7 @@ interface BaseArgs<T> extends RequestInit {
 }
 
 interface PostArgs<T> extends BaseArgs<T> {
-  body: any; // justification: any type is needed here to allow any type of body
+  body: any;
 }
 
 interface GetArgs<T> extends BaseArgs<T> { }
@@ -30,6 +30,7 @@ interface DeleteArgs<T> extends GetArgs<T> { }
 
 type ConstructorArgs = {
   baseUrl: string;
+  debug?: boolean;
   defaultHeaders?: () => HeadersInit;
 };
 
@@ -50,37 +51,19 @@ type ConstructorArgs = {
 
 export class Spellbinder {
   private baseUrl: string;
+  private DEBUG = false;
   private defaultHeaders = getDefaultHeaders;
 
   constructor(args: ConstructorArgs) {
     this.baseUrl = args.baseUrl;
+
+    if (args.debug) {
+      this.DEBUG = args.debug;
+    }
+
     if (args.defaultHeaders) {
       this.defaultHeaders = args.defaultHeaders;
     }
-  }
-
-  public async post<T>({
-    url,
-    schema,
-    headers,
-    body,
-    params,
-    ...rest
-  }: PostArgs<T>): Promise<T> {
-    const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
-    const requestHeaders = headers || this.defaultHeaders();
-    const requestBody = body;
-
-    const response = await fetch(requestUrl, {
-      method: "POST",
-      body: JSON.stringify(requestBody),
-      headers: requestHeaders,
-      ...rest,
-    });
-
-    const data = await response.json();
-
-    return validateData(data, schema);
   }
 
   public async get<T>({
@@ -99,6 +82,57 @@ export class Spellbinder {
       ...rest,
     });
 
+    if (this.DEBUG) {
+      debugLogger({
+        httpMethod: "GET",
+        url: requestUrl,
+        headers: requestHeaders,
+        body: null,
+        response,
+      });
+    }
+
+    const data = await response.json();
+
+    return validateData(data, schema);
+  }
+
+  public async post<T>({
+    url,
+    schema,
+    headers,
+    body,
+    params,
+    ...rest
+  }: PostArgs<T>): Promise<T> {
+    const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
+    const requestHeaders = headers || this.defaultHeaders();
+    const requestBody = parseBody(body);
+
+    if (requestBody instanceof FormData) {
+      if (requestHeaders) {
+        // @ts-ignore
+        requestHeaders["Content-Type"] = "multipart/form-data";
+      }
+    }
+
+    const response = await fetch(requestUrl, {
+      method: "POST",
+      body: requestBody,
+      headers: requestHeaders,
+      ...rest,
+    });
+
+    if (this.DEBUG) {
+      debugLogger({
+        httpMethod: "POST",
+        url: requestUrl,
+        headers: requestHeaders,
+        body: requestBody,
+        response,
+      });
+    }
+
     const data = await response.json();
 
     return validateData(data, schema);
@@ -114,14 +148,31 @@ export class Spellbinder {
   }: PutArgs<T>): Promise<T> {
     const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
     const requestHeaders = headers || this.defaultHeaders();
-    const requestBody = body;
+    const requestBody = parseBody(body);
+
+    if (requestBody instanceof FormData) {
+      if (requestHeaders) {
+        // @ts-ignore
+        requestHeaders["Content-Type"] = "multipart/form-data";
+      }
+    }
 
     const response = await fetch(requestUrl, {
       method: "PUT",
-      body: JSON.stringify(requestBody),
+      body: requestBody,
       headers: requestHeaders,
       ...rest,
     });
+
+    if (this.DEBUG) {
+      debugLogger({
+        httpMethod: "PUT",
+        url: requestUrl,
+        headers: requestHeaders,
+        body: requestBody,
+        response,
+      });
+    }
 
     const data = await response.json();
 
@@ -138,14 +189,31 @@ export class Spellbinder {
   }: PatchArgs<T>): Promise<T> {
     const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
     const requestHeaders = headers || this.defaultHeaders();
-    const requestBody = body;
+    const requestBody = parseBody(body);
+
+    if (requestBody instanceof FormData) {
+      if (requestHeaders) {
+        // @ts-ignore
+        requestHeaders["Content-Type"] = "multipart/form-data";
+      }
+    }
 
     const response = await fetch(requestUrl, {
       method: "PATCH",
-      body: JSON.stringify(requestBody),
+      body: requestBody,
       headers: requestHeaders,
       ...rest,
     });
+
+    if (this.DEBUG) {
+      debugLogger({
+        httpMethod: "PATCH",
+        url: requestUrl,
+        headers: requestHeaders,
+        body: requestBody,
+        response,
+      });
+    }
 
     const data = await response.json();
 
@@ -167,6 +235,16 @@ export class Spellbinder {
       headers: requestHeaders,
       ...rest,
     });
+
+    if (this.DEBUG) {
+      debugLogger({
+        httpMethod: "DELETE",
+        url: requestUrl,
+        headers: requestHeaders,
+        body: null,
+        response,
+      });
+    }
 
     const data = await response.json();
 
