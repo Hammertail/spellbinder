@@ -82,6 +82,9 @@ export class Spellbinder {
       ...rest,
     });
 
+    const data = await response.json();
+    const validatedData = validateData(data, schema);
+
     if (this.DEBUG) {
       debugLogger({
         httpMethod: "GET",
@@ -92,9 +95,7 @@ export class Spellbinder {
       });
     }
 
-    const data = await response.json();
-
-    return validateData(data, schema);
+    return validatedData;
   }
 
   public async post<T>({
@@ -123,6 +124,9 @@ export class Spellbinder {
       ...rest,
     });
 
+    const data = await response.json();
+    const validatedData = validateData(data, schema);
+
     if (this.DEBUG) {
       debugLogger({
         httpMethod: "POST",
@@ -133,9 +137,7 @@ export class Spellbinder {
       });
     }
 
-    const data = await response.json();
-
-    return validateData(data, schema);
+    return validatedData;
   }
 
   public async put<T>({
@@ -164,6 +166,9 @@ export class Spellbinder {
       ...rest,
     });
 
+    const data = await response.json();
+    const validatedData = validateData(data, schema);
+
     if (this.DEBUG) {
       debugLogger({
         httpMethod: "PUT",
@@ -174,9 +179,7 @@ export class Spellbinder {
       });
     }
 
-    const data = await response.json();
-
-    return validateData(data, schema);
+    return validatedData;
   }
 
   public async patch<T>({
@@ -205,6 +208,9 @@ export class Spellbinder {
       ...rest,
     });
 
+    const data = await response.json();
+    const validatedData = validateData(data, schema);
+
     if (this.DEBUG) {
       debugLogger({
         httpMethod: "PATCH",
@@ -215,9 +221,7 @@ export class Spellbinder {
       });
     }
 
-    const data = await response.json();
-
-    return validateData(data, schema);
+    return validatedData;
   }
 
   public async delete<T>({
@@ -236,6 +240,9 @@ export class Spellbinder {
       ...rest,
     });
 
+    const data = await response.json();
+    const validatedData = validateData(data, schema);
+
     if (this.DEBUG) {
       debugLogger({
         httpMethod: "DELETE",
@@ -246,8 +253,6 @@ export class Spellbinder {
       });
     }
 
-    const data = await response.json();
-
-    return validateData(data, schema);
+    return validatedData;
   }
 }
