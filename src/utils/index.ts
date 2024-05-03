@@ -21,16 +21,16 @@ export function validateData<T>(data: any, schema: z.ZodSchema<T>): T {
 export function safeValidateData<T>(
   data: any,
   schema: z.ZodSchema<T>
-): T | null {
+): T | z.ZodError {
   const validated = schema.safeParse(data);
   if (!validated.success) {
-    return null;
+    return validated.error;
   }
 
   return validated.data;
 }
 
-export const getDefaultHeaders = (): HeadersInit => {
+export const getDefaultHeaders = async (): Promise<HeadersInit> => {
   const defaultHeaders = {
     "Content-Type": "application/json",
     Accept: "application/json",

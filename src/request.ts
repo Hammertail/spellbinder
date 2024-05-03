@@ -1,10 +1,11 @@
 //* Libraries imports
-import type z from "zod";
+import z from "zod";
 
 //* Local imports
 import {
   mergeUrls,
   validateData,
+  safeValidateData,
   getDefaultHeaders,
   createUrl
 } from "./utils";
@@ -28,10 +29,21 @@ interface PutArgs<T> extends PostArgs<T> { }
 interface PatchArgs<T> extends PostArgs<T> { }
 interface DeleteArgs<T> extends GetArgs<T> { }
 
+type baseSafeReturn<T> = Promise<
+  {
+    success: true;
+    data: T;
+  }
+  | {
+    success: false;
+    error: z.ZodError;
+  }
+>;
+
 type ConstructorArgs = {
   baseUrl: string;
   debug?: boolean;
-  defaultHeaders?: () => HeadersInit;
+  defaultHeaders?: () => Promise<HeadersInit>;
 };
 
 /**
@@ -74,13 +86,16 @@ export class Spellbinder {
     ...rest
   }: GetArgs<T>): Promise<T> {
     const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
-    const requestHeaders = headers || this.defaultHeaders();
+    const requestHeaders = headers || await this.defaultHeaders();
 
     const response = await fetch(requestUrl, {
       method: "GET",
       headers: requestHeaders,
       ...rest,
     });
+
+    const data = await response.json();
+    const validatedData = validateData(data, schema);
 
     if (this.DEBUG) {
       debugLogger({
@@ -92,10 +107,51 @@ export class Spellbinder {
       });
     }
 
-    const data = await response.json();
-
-    return validateData(data, schema);
+    return validatedData;
   }
+
+  public async safeGet<T>({
+    url,
+    schema,
+    headers,
+    params,
+    ...rest
+  }: GetArgs<T>): Promise<baseSafeReturn<T>> {
+    const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
+    const requestHeaders = headers || await this.defaultHeaders();
+
+    const response = await fetch(requestUrl, {
+      method: "GET",
+      headers: requestHeaders,
+      ...rest,
+    });
+
+    const data = await response.json();
+    const validatedData = safeValidateData(data, schema);
+
+    if (this.DEBUG) {
+      debugLogger({
+        httpMethod: "GET",
+        url: requestUrl,
+        headers: requestHeaders,
+        body: null,
+        response,
+      });
+    }
+
+    if (validatedData instanceof z.ZodError) {
+      return {
+        success: false,
+        error: validatedData,
+      };
+    }
+
+    return {
+      success: true,
+      data: validatedData,
+    }
+  }
+
 
   public async post<T>({
     url,
@@ -106,7 +162,7 @@ export class Spellbinder {
     ...rest
   }: PostArgs<T>): Promise<T> {
     const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
-    const requestHeaders = headers || this.defaultHeaders();
+    const requestHeaders = headers || await this.defaultHeaders();
     const requestBody = parseBody(body);
 
     if (requestBody instanceof FormData) {
@@ -123,6 +179,9 @@ export class Spellbinder {
       ...rest,
     });
 
+    const data = await response.json();
+    const validatedData = validateData(data, schema);
+
     if (this.DEBUG) {
       debugLogger({
         httpMethod: "POST",
@@ -133,9 +192,59 @@ export class Spellbinder {
       });
     }
 
-    const data = await response.json();
+    return validatedData;
+  }
 
-    return validateData(data, schema);
+  public async safePost<T>({
+    url,
+    schema,
+    headers,
+    body,
+    params,
+    ...rest
+  }: PostArgs<T>): Promise<baseSafeReturn<T>> {
+    const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
+    const requestHeaders = headers || await this.defaultHeaders();
+    const requestBody = parseBody(body);
+
+    if (requestBody instanceof FormData) {
+      if (requestHeaders) {
+        // @ts-ignore
+        requestHeaders["Content-Type"] = "multipart/form-data";
+      }
+    }
+
+    const response = await fetch(requestUrl, {
+      method: "POST",
+      body: requestBody,
+      headers: requestHeaders,
+      ...rest,
+    });
+
+    const data = await response.json();
+    const validatedData = safeValidateData(data, schema);
+
+    if (this.DEBUG) {
+      debugLogger({
+        httpMethod: "POST",
+        url: requestUrl,
+        headers: requestHeaders,
+        body: requestBody,
+        response,
+      });
+    }
+
+    if (validatedData instanceof z.ZodError) {
+      return {
+        success: false,
+        error: validatedData,
+      };
+    }
+
+    return {
+      success: true,
+      data: validatedData,
+    }
   }
 
   public async put<T>({
@@ -147,7 +256,7 @@ export class Spellbinder {
     ...rest
   }: PutArgs<T>): Promise<T> {
     const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
-    const requestHeaders = headers || this.defaultHeaders();
+    const requestHeaders = headers || await this.defaultHeaders();
     const requestBody = parseBody(body);
 
     if (requestBody instanceof FormData) {
@@ -164,6 +273,9 @@ export class Spellbinder {
       ...rest,
     });
 
+    const data = await response.json();
+    const validatedData = validateData(data, schema);
+
     if (this.DEBUG) {
       debugLogger({
         httpMethod: "PUT",
@@ -174,9 +286,59 @@ export class Spellbinder {
       });
     }
 
-    const data = await response.json();
+    return validatedData;
+  }
 
-    return validateData(data, schema);
+  public async safePut<T>({
+    url,
+    schema,
+    headers,
+    body,
+    params,
+    ...rest
+  }: PutArgs<T>): Promise<baseSafeReturn<T>> {
+    const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
+    const requestHeaders = headers || await this.defaultHeaders();
+    const requestBody = parseBody(body);
+
+    if (requestBody instanceof FormData) {
+      if (requestHeaders) {
+        // @ts-ignore
+        requestHeaders["Content-Type"] = "multipart/form-data";
+      }
+    }
+
+    const response = await fetch(requestUrl, {
+      method: "PUT",
+      body: requestBody,
+      headers: requestHeaders,
+      ...rest,
+    });
+
+    const data = await response.json();
+    const validatedData = safeValidateData(data, schema);
+
+    if (this.DEBUG) {
+      debugLogger({
+        httpMethod: "PUT",
+        url: requestUrl,
+        headers: requestHeaders,
+        body: requestBody,
+        response,
+      });
+    }
+
+    if (validatedData instanceof z.ZodError) {
+      return {
+        success: false,
+        error: validatedData,
+      };
+    }
+
+    return {
+      success: true,
+      data: validatedData,
+    }
   }
 
   public async patch<T>({
@@ -188,7 +350,7 @@ export class Spellbinder {
     ...rest
   }: PatchArgs<T>): Promise<T> {
     const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
-    const requestHeaders = headers || this.defaultHeaders();
+    const requestHeaders = headers || await this.defaultHeaders();
     const requestBody = parseBody(body);
 
     if (requestBody instanceof FormData) {
@@ -205,6 +367,9 @@ export class Spellbinder {
       ...rest,
     });
 
+    const data = await response.json();
+    const validatedData = validateData(data, schema);
+
     if (this.DEBUG) {
       debugLogger({
         httpMethod: "PATCH",
@@ -215,9 +380,59 @@ export class Spellbinder {
       });
     }
 
-    const data = await response.json();
+    return validatedData;
+  }
 
-    return validateData(data, schema);
+  public async safePatch<T>({
+    url,
+    schema,
+    headers,
+    body,
+    params,
+    ...rest
+  }: PatchArgs<T>): Promise<baseSafeReturn<T>> {
+    const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
+    const requestHeaders = headers || await this.defaultHeaders();
+    const requestBody = parseBody(body);
+
+    if (requestBody instanceof FormData) {
+      if (requestHeaders) {
+        // @ts-ignore
+        requestHeaders["Content-Type"] = "multipart/form-data";
+      }
+    }
+
+    const response = await fetch(requestUrl, {
+      method: "PATCH",
+      body: requestBody,
+      headers: requestHeaders,
+      ...rest,
+    });
+
+    const data = await response.json();
+    const validatedData = safeValidateData(data, schema);
+
+    if (this.DEBUG) {
+      debugLogger({
+        httpMethod: "PATCH",
+        url: requestUrl,
+        headers: requestHeaders,
+        body: requestBody,
+        response,
+      });
+    }
+
+    if (validatedData instanceof z.ZodError) {
+      return {
+        success: false,
+        error: validatedData,
+      };
+    }
+
+    return {
+      success: true,
+      data: validatedData,
+    }
   }
 
   public async delete<T>({
@@ -228,13 +443,16 @@ export class Spellbinder {
     ...rest
   }: DeleteArgs<T>): Promise<T> {
     const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
-    const requestHeaders = headers || this.defaultHeaders();
+    const requestHeaders = headers || await this.defaultHeaders();
 
     const response = await fetch(requestUrl, {
       method: "DELETE",
       headers: requestHeaders,
       ...rest,
     });
+
+    const data = await response.json();
+    const validatedData = validateData(data, schema);
 
     if (this.DEBUG) {
       debugLogger({
@@ -246,8 +464,48 @@ export class Spellbinder {
       });
     }
 
-    const data = await response.json();
+    return validatedData;
+  }
 
-    return validateData(data, schema);
+  public async safeDelete<T>({
+    url,
+    schema,
+    headers,
+    params,
+    ...rest
+  }: DeleteArgs<T>): Promise<baseSafeReturn<T>> {
+    const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
+    const requestHeaders = headers || await this.defaultHeaders();
+
+    const response = await fetch(requestUrl, {
+      method: "DELETE",
+      headers: requestHeaders,
+      ...rest,
+    });
+
+    const data = await response.json();
+    const validatedData = safeValidateData(data, schema);
+
+    if (this.DEBUG) {
+      debugLogger({
+        httpMethod: "DELETE",
+        url: requestUrl,
+        headers: requestHeaders,
+        body: null,
+        response,
+      });
+    }
+
+    if (validatedData instanceof z.ZodError) {
+      return {
+        success: false,
+        error: validatedData,
+      };
+    }
+
+    return {
+      success: true,
+      data: validatedData,
+    }
   }
 }
