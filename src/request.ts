@@ -31,7 +31,7 @@ interface DeleteArgs<T> extends GetArgs<T> { }
 type ConstructorArgs = {
   baseUrl: string;
   debug?: boolean;
-  defaultHeaders?: () => HeadersInit;
+  defaultHeaders?: () => Promise<HeadersInit>;
 };
 
 /**
@@ -74,7 +74,7 @@ export class Spellbinder {
     ...rest
   }: GetArgs<T>): Promise<T> {
     const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
-    const requestHeaders = headers || this.defaultHeaders();
+    const requestHeaders = headers || await this.defaultHeaders();
 
     const response = await fetch(requestUrl, {
       method: "GET",
@@ -106,7 +106,7 @@ export class Spellbinder {
     ...rest
   }: PostArgs<T>): Promise<T> {
     const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
-    const requestHeaders = headers || this.defaultHeaders();
+    const requestHeaders = headers || await this.defaultHeaders();
     const requestBody = parseBody(body);
 
     if (requestBody instanceof FormData) {
@@ -147,7 +147,7 @@ export class Spellbinder {
     ...rest
   }: PutArgs<T>): Promise<T> {
     const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
-    const requestHeaders = headers || this.defaultHeaders();
+    const requestHeaders = headers || await this.defaultHeaders();
     const requestBody = parseBody(body);
 
     if (requestBody instanceof FormData) {
@@ -188,7 +188,7 @@ export class Spellbinder {
     ...rest
   }: PatchArgs<T>): Promise<T> {
     const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
-    const requestHeaders = headers || this.defaultHeaders();
+    const requestHeaders = headers || await this.defaultHeaders();
     const requestBody = parseBody(body);
 
     if (requestBody instanceof FormData) {
@@ -228,7 +228,7 @@ export class Spellbinder {
     ...rest
   }: DeleteArgs<T>): Promise<T> {
     const requestUrl = params ? createUrl(this.baseUrl, url, params) : mergeUrls(this.baseUrl, url);
-    const requestHeaders = headers || this.defaultHeaders();
+    const requestHeaders = headers || await this.defaultHeaders();
 
     const response = await fetch(requestUrl, {
       method: "DELETE",

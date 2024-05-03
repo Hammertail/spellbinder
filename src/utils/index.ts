@@ -30,7 +30,7 @@ export function safeValidateData<T>(
   return validated.data;
 }
 
-export const getDefaultHeaders = (): HeadersInit => {
+export const getDefaultHeaders = async (): Promise<HeadersInit> => {
   const defaultHeaders = {
     "Content-Type": "application/json",
     Accept: "application/json",
