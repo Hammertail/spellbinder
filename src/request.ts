@@ -7,7 +7,8 @@ import {
   validateData,
   safeValidateData,
   getDefaultHeaders,
-  createUrl
+  createUrl,
+  SpellError
 } from "./utils";
 import { parseBody } from "./utils/parse-body";
 import { debugLogger } from "./utils/debug-logger";
