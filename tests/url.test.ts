@@ -1,53 +1,57 @@
-import { test, it, describe } from "node:test";
+//* Libraries imports
+import { describe, it } from "node:test";
 import { equal } from "node:assert";
-import assert from "node:assert";
 
-import z from "zod";
+//* Local imports
+import { createUrl, createUrlArgs, mergeUrls } from "../src/utils";
 
-import {
-  createUrl,
-  createUrlArgs,
-  fixUrlEnd,
-  fixUrlStart,
-  getDefaultHeaders,
-  mergeUrls
-} from "../src/utils";
+describe("URL utilities", () => {
+  describe("mergeUrls", () => {
+    it("concatenates the base URL with a path that starts with a slash", () => {
+      const url = "/users/tamicktom";
+      const baseUrl = "https://echo.example.com";
 
-test("Url Params functions test", async () => {
-  await it("should return the correct url", async () => {
-    const url = "/users/tamicktom";
-    const baseIrl = "https://echo.hoppscotch.io";
+      const mergedUrl = mergeUrls(baseUrl, url);
 
-    const mergedUrl = mergeUrls(baseIrl, url);
-
-    equal(mergedUrl, "https://echo.hoppscotch.io/users/tamicktom");
+      equal(mergedUrl, "https://echo.example.com/users/tamicktom");
+    });
   });
 
-  await it("should create the right url with url params", async () => {
-    const params = { page: 1, limit: 10 };
+  describe("createUrlArgs", () => {
+    it("builds a query string from an object of parameters", () => {
+      const params = { page: 1, limit: 10 };
 
-    const urlParams = createUrlArgs(params);
+      const urlParams = createUrlArgs(params);
 
-    equal(urlParams, "?page=1&limit=10");
+      equal(urlParams, "?page=1&limit=10");
+    });
   });
 
-  await it("should create the right url with url params and base url", async () => {
-    const params = { page: 1, limit: 10 };
-    const baseUrl = "https://echo.hoppscotch.io";
-    const url = "/users/tamicktom";
+  describe("createUrl", () => {
+    it("builds a full URL when the path starts with a slash", () => {
+      const params = { page: 1, limit: 10 };
+      const baseUrl = "https://echo.example.com";
+      const url = "/users/tamicktom";
 
-    const urlWithParams = createUrl(baseUrl, url, params);
+      const urlWithParams = createUrl(baseUrl, url, params);
 
-    equal(urlWithParams, "https://echo.hoppscotch.io/users/tamicktom?page=1&limit=10");
-  });
+      equal(
+        urlWithParams,
+        "https://echo.example.com/users/tamicktom?page=1&limit=10"
+      );
+    });
 
-  await it("should create the right url with url params and base url", async () => {
-    const params = { page: 1, limit: 10 };
-    const baseUrl = "https://echo.hoppscotch.io";
-    const url = "users/tamicktom";
+    it("builds a full URL when the path does not start with a slash", () => {
+      const params = { page: 1, limit: 10 };
+      const baseUrl = "https://echo.example.com";
+      const url = "users/tamicktom";
 
-    const urlWithParams = createUrl(baseUrl, url, params);
+      const urlWithParams = createUrl(baseUrl, url, params);
 
-    equal(urlWithParams, "https://echo.hoppscotch.io/users/tamicktom?page=1&limit=10");
+      equal(
+        urlWithParams,
+        "https://echo.example.com/users/tamicktom?page=1&limit=10"
+      );
+    });
   });
 });

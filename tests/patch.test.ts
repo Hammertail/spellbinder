@@ -1,171 +1,197 @@
-import { test, it, describe } from "node:test";
-import { equal } from "node:assert";
+//* Libraries imports
+import { describe, it, afterEach, mock } from "node:test";
 import assert from "node:assert";
-
 import z from "zod";
 
+//* Local imports
 import { Spellbinder, SpellError } from "../src";
+import { mockFetch, createEchoHandler } from "./helpers/mock-fetch";
 
-test("Spellbinder Patch tests", async () => {
-  await it("should return the correct data", async () => {
-    const url = "/";
-    const spellbinder = new Spellbinder({
-      baseUrl: "https://echo.hoppscotch.io",
+describe("Spellbinder", () => {
+  describe("patch", () => {
+    afterEach(() => {
+      mock.restoreAll();
     });
 
-    const schema = z.object({
-      method: z.enum(["PATCH"]),
-      args: z.object({}),
-      data: z.string(),
-      path: z.string(),
-    });
+    it("returns validated data when the response matches the schema", async () => {
+      mockFetch(createEchoHandler("PATCH"));
 
-    const body = { data: "Hello, World!" };
+      const spellbinder = new Spellbinder({
+        baseUrl: "https://echo.example.com",
+      });
 
-    const response = await spellbinder.patch({
-      url,
-      schema,
-      body,
-    });
+      const schema = z.object({
+        method: z.enum(["PATCH"]),
+        args: z.object({}),
+        data: z.string(),
+        path: z.string(),
+      });
 
-    assert(response.data === JSON.stringify(body));
-  });
+      const body = { data: "Hello, World!" };
 
-  await it("should throw an error if the schema is incorrect", async () => {
-    const url = "/";
-    const spellbinder = new Spellbinder({
-      baseUrl: "https://echo.hoppscotch.io",
-    });
-
-    const schema = z.object({
-      method: z.enum(["PATCH"]),
-      args: z.object({}),
-      data: z.number(),
-      path: z.number(),
-    });
-
-    const body = { data: "Hello, World!" };
-
-    try {
-      await spellbinder.patch({
-        url,
+      const response = await spellbinder.patch({
+        url: "/",
         schema,
         body,
       });
-    } catch (error) {
-      assert(error instanceof SpellError);
-    }
-  });
 
-  await it("should work with custom headers", async () => {
-    const url = "/";
-    const spellbinder = new Spellbinder({
-      baseUrl: "https://echo.hoppscotch.io",
+      assert.equal(response.data, JSON.stringify(body));
     });
 
-    const schema = z.object({
-      method: z.enum(["PATCH"]),
-      args: z.object({}),
-      data: z.string(),
-      path: z.string(),
+    it("throws a SpellError when the response does not match the schema", async () => {
+      mockFetch(createEchoHandler("PATCH"));
+
+      const spellbinder = new Spellbinder({
+        baseUrl: "https://echo.example.com",
+      });
+
+      const schema = z.object({
+        method: z.enum(["PATCH"]),
+        args: z.object({}),
+        data: z.number(),
+        path: z.number(),
+      });
+
+      const body = { data: "Hello, World!" };
+
+      await assert.rejects(
+        () =>
+          spellbinder.patch({
+            url: "/",
+            schema,
+            body,
+          }),
+        (error: unknown) => error instanceof SpellError
+      );
     });
 
-    const body = { data: "Hello, World!" };
+    it("sends the request with custom headers", async () => {
+      const fetchMock = mockFetch(createEchoHandler("PATCH"));
 
-    const response = await spellbinder.patch({
-      url,
-      schema,
-      body,
-      headers: {
+      const spellbinder = new Spellbinder({
+        baseUrl: "https://echo.example.com",
+      });
+
+      const schema = z.object({
+        method: z.enum(["PATCH"]),
+        args: z.object({}),
+        data: z.string(),
+        path: z.string(),
+      });
+
+      const body = { data: "Hello, World!" };
+      const headers = {
         "Content-Type": "application/json",
-      },
+        "X-Custom-Header": "spellbinder",
+      };
+
+      const response = await spellbinder.patch({
+        url: "/",
+        schema,
+        body,
+        headers,
+      });
+
+      assert.equal(response.data, JSON.stringify(body));
+      assert.equal(fetchMock.mock.callCount(), 1);
+
+      const fetchInit = fetchMock.mock.calls[0]?.arguments[1] as
+        | RequestInit
+        | undefined;
+
+      assert.deepEqual(fetchInit?.headers, headers);
     });
 
-    assert(response.data === JSON.stringify(body));
-  });
+    it("requests the correct path for a nested route", async () => {
+      mockFetch(createEchoHandler("PATCH"));
 
-  await it("should work with another route", async () => {
-    const url = "/patch";
-    const spellbinder = new Spellbinder({
-      baseUrl: "https://echo.hoppscotch.io",
+      const spellbinder = new Spellbinder({
+        baseUrl: "https://echo.example.com",
+      });
+
+      const schema = z.object({
+        method: z.enum(["PATCH"]),
+        args: z.object({}),
+        data: z.string(),
+        path: z.literal("/patch"),
+      });
+
+      const body = { data: "Hello, World!" };
+
+      const response = await spellbinder.patch({
+        url: "/patch",
+        schema,
+        body,
+      });
+
+      assert.equal(response.data, JSON.stringify(body));
+      assert.equal(response.path, "/patch");
     });
 
-    const schema = z.object({
-      method: z.enum(["PATCH"]),
-      args: z.object({}),
-      data: z.string(),
-      path: z.literal("/patch"),
+    it("appends URL parameters to the request", async () => {
+      mockFetch(createEchoHandler("PATCH"));
+
+      const spellbinder = new Spellbinder({
+        baseUrl: "https://echo.example.com",
+      });
+
+      const params = { name: "John", age: "30" };
+
+      const schema = z.object({
+        method: z.enum(["PATCH"]),
+        data: z.string(),
+        path: z.literal("/patch"),
+        args: z.object({
+          name: z.literal("John"),
+          age: z.literal("30"),
+        }),
+      });
+
+      const body = { data: "Hello, World!" };
+
+      const response = await spellbinder.patch({
+        url: "/patch",
+        schema,
+        body,
+        params,
+      });
+
+      assert.equal(response.data, JSON.stringify(body));
+      assert.deepEqual(response.args, params);
     });
 
-    const body = { data: "Hello, World!" };
+    it("sends multipart/form-data bodies without throwing", async () => {
+      mockFetch(createEchoHandler("PATCH"));
 
-    const response = await spellbinder.patch({
-      url,
-      schema,
-      body,
-    });
+      const spellbinder = new Spellbinder({
+        baseUrl: "https://echo.example.com",
+      });
 
-    assert(response.data === JSON.stringify(body));
-  });
+      const params = { name: "John", age: "30" };
 
-  await it("should work with URL parameters", async () => {
-    const url = "/patch";
-    const spellbinder = new Spellbinder({
-      baseUrl: "https://echo.hoppscotch.io",
-    });
+      const schema = z.object({
+        method: z.enum(["PATCH"]),
+        data: z.string(),
+        path: z.literal("/"),
+        args: z.object({
+          name: z.literal("John"),
+          age: z.literal("30"),
+        }),
+      });
 
-    const params = { name: "John", age: "30" };
+      const body = new FormData();
+      body.append("name", "John");
+      body.append("age", "30");
 
-    const schema = z.object({
-      method: z.enum(["PATCH"]),
-      data: z.string(),
-      path: z.literal("/patch"),
-      args: z.object({
-        name: z.literal("John"),
-        age: z.literal("30"),
-      }),
-    });
+      const response = await spellbinder.patch({
+        url: "/",
+        schema,
+        body,
+        params,
+      });
 
-    const body = { data: "Hello, World!" };
-
-    const response = await spellbinder.patch({
-      url,
-      schema,
-      body,
-      params,
-    });
-
-    assert(response.data === JSON.stringify(body));
-  });
-
-  await it("Should be able to send multipart/form-data", async () => {
-    const url = "/";
-    const spellbinder = new Spellbinder({
-      baseUrl: "https://echo.hoppscotch.io",
-    });
-
-    const params = { name: "John", age: "30" };
-
-    const schema = z.object({
-      method: z.enum(["PATCH"]),
-      data: z.string(),
-      path: z.literal("/"),
-      args: z.object({
-        name: z.literal("John"),
-        age: z.literal("30"),
-      }),
-    });
-
-    const body = new FormData();
-
-    body.append("name", "John");
-    body.append("age", "30");
-
-    await spellbinder.patch({
-      url,
-      schema,
-      body,
-      params
+      assert.equal(response.method, "PATCH");
+      assert.deepEqual(response.args, params);
     });
   });
 });

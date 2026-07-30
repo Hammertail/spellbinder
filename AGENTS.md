@@ -20,9 +20,9 @@ failures. With pnpm, dependency test files live under `node_modules/.pnpm/` (a d
 ### Running things
 
 - Lint / typecheck: `pnpm run lint` (just `tsc --noEmit`).
-- Tests: `pnpm run test` (node's built-in test runner via `tsx`). Some tests make **real
-  network requests** to `api.github.com` and `echo.hoppscotch.io`, so they require internet
-  access; failures there may be network-related rather than code bugs.
+- Tests: `pnpm run test` (node's built-in test runner via `tsx`). HTTP calls are mocked via
+  `tests/helpers/mock-fetch.ts` (no real third-party network requests). Tests use BDD-style
+  `describe` / `it` naming.
 - Build: `pnpm run build` (`tsup`). pnpm reports esbuild's install script as "ignored", but the
   build still succeeds because `tsup` bundles its own esbuild — you do not need to approve build
   scripts for the build to work.
